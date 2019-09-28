@@ -8,7 +8,6 @@ Created on Thu Sep 26 11:02:24 2019
 
 import numpy as np
 import pandas as pd
-import math
 
 train_x = np.load('/Users/lordxuzhiyu/Desktop/mnist_data/mnist.train.npy')
 train_y = np.load('/Users/lordxuzhiyu/Desktop/mnist_data/mnist.trainlabel.npy')
@@ -49,32 +48,61 @@ class NeuralNetwork:
         deriv = 1.0 - np.tanh(x)**2
         return deriv
     
-    def cross_entropy_loss(self, y_hat, y):
-        if y == 1:
-            loss = -np.log(y_hat)
-        else:
-            loss = -np.log(1 - y_hat)
-        return loss
+    def mini_batch(self, matrix, batch_size):
+        size = matrix.shape[0]
+        mask = np.random.choice(size, batch_size)
+        matrix_batch = matrix[mask]
+        return matrix_batch
     
-    def softmax(self, x):
-        # Avoid the overflow
-        exps = np.exp(x - np.max(x))
-        result = exps / np.sum(exps)
+    def cross_entropy_loss(self, y, t):
+        # y is the output of the neural network
+        # t is the test data value
+        batch_size = 32
+        y = self.mini_batch(y, batch_size)
+        t = self.mini_batch(t, batch_size)
+        delta = 1e-7
+        whole_loss = -np.sum(t * np.log(y + delta))
+        result = whole_loss / batch_size 
         return result
     
-    def cross_entropy(self, X,y):
-        """
-        X is the output from fully connected layer (num_examples x num_classes)
-        y is labels (num_examples x 1)
-        	Note that y is not one-hot encoded vector. 
-        	It can be computed as y.argmax(axis=1) from one-hot encoded vectors of labels if required.
-        """
-        m = y.shape[0]
-        p = self.softmax(X)
-        log_likelihood = -np.log(p[range(m),y])
-        loss = np.sum(log_likelihood) / m
-        return loss
+    def train(self, inputs, targets):
+        # calculate signals into hidden layer
+        hidden_inputs = np.dot(self.weight1, inputs)
+        # calculate the signals emerging from hidden layer
+        hidden_outputs = self.tanh(hidden_inputs)
+        
+        # calculate signals into final output layer
+        final_inputs = np.dot(self.weight2, hidden_outputs)
+        # calculate the signals emerging from final output layer
+        final_outputs = self.tanh(final_inputs)
+        
+        # output layer error is the (target - actual)
+        output_errors = targets - final_outputs
+        # hidden layer error is the output_errors, split by weights, recombined at hidden nodes
+        hidden_errors = np.dot(self.weight2.T, output_errors) 
+        
+        # update the weights for the links between the hidden and output layers
+        self.weight2 += self.lr * np.dot((output_errors * final_outputs * (1.0 - final_outputs)), np.transpose(hidden_outputs))
+        
+        # update the weights for the links between the input and hidden layers
+        self.weight1 += self.lr * np.dot((hidden_errors * hidden_outputs * (1.0 - hidden_outputs)), np.transpose(inputs))
+        
+        pass
     
+    def query(self, inputs):
+        # calculate signals into hidden layer
+        hidden_inputs = np.dot(self.weight1, inputs)
+        # calculate the signals emerging from hidden layer
+        hidden_outputs = self.tanh(hidden_inputs)
+        
+        # calculate signals into final output layer
+        final_inputs = np.dot(self.weight2, hidden_outputs)
+        # calculate the signals emerging from final output layer
+        final_outputs = self.tanh(final_inputs)
+        
+        return final_outputs
+    
+
     
 
 
