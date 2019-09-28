@@ -10,14 +10,14 @@ import numpy as np
 import pandas as pd
 
 class NeuralNetwork:
-    def __init__(self, hidden1, hidden2, output_unit, learning_rate, n):
+    def __init__(self, hidden1, hidden2, output_unit, learning_rate, N):
         self.hidden1 = self.hidden1
         self.hidden2 = self.hidden2
         self.output_unit = self.output_unit
         
-        # Initialize the weights use 1/n. 
-        # n is the total number of the instances from training set 
-        self.weight = 1 / n
+        # Initialize the weights use 1/N. 
+        # N is the total number of the instances from training set 
+        self.weight = 1 / N
         self.weight1 = np.random.normal(self.weight, pow(self.hidden1, -0.5), (self.hidden2, self.hidden1))
         self.weight2 = np.random.normal(self.weight, pow(self.hidden2, -0.5), (self.output_unit, self.hidden2))
         
@@ -87,6 +87,7 @@ class NeuralNetwork:
         return final_outputs
     
 
+
 # Source Data
 train_x = np.load('/Users/lordxuzhiyu/Desktop/mnist_data/mnist.train.npy')
 train_y = np.load('/Users/lordxuzhiyu/Desktop/mnist_data/mnist.trainlabel.npy')
@@ -121,4 +122,19 @@ test_y = test_y.reshape(-1, 1)
 train_y = one_hot_encoding(train_y, classes = 10)
 test_y = one_hot_encoding(test_y, classes = 10)       
 
- 
+
+# Parameters
+hidden1 = 784
+hidden2 = 256
+output_unit = 10
+learning_rate = 0.1
+N = train_x.shape[0]
+
+
+# Create instance of Class NeuralNetwork
+n = NeuralNetwork(hidden1, hidden2, output_unit, learning_rate, N)
+
+# Training
+epochs = 50
+
+    
