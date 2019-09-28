@@ -9,22 +9,6 @@ Created on Thu Sep 26 11:02:24 2019
 import numpy as np
 import pandas as pd
 
-train_x = np.load('/Users/lordxuzhiyu/Desktop/mnist_data/mnist.train.npy')
-train_y = np.load('/Users/lordxuzhiyu/Desktop/mnist_data/mnist.trainlabel.npy')
-test_x = np.load('/Users/lordxuzhiyu/Desktop/mnist_data/mnist.test.npy')
-test_y = pd.read_csv('/Users/lordxuzhiyu/Desktop/mnist_data/sample_submission.csv', usecols = ['class'])
-
-train_y = train_y.reshape(-1, 1)
-test_y = test_y.to_numpy()
-test_y = test_y.reshape(-1, 1)
-
-train_x = train_x / 255
-test_x = test_x / 255
-
-pixels = 784
-train_x = train_x.reshape(train_x.shape[0], pixels)
-test_x = test_x.reshape(test_x.shape[0], pixels)
-
 class NeuralNetwork:
     def __init__(self, hidden1, hidden2, output_unit, learning_rate, n):
         self.hidden1 = self.hidden1
@@ -103,11 +87,38 @@ class NeuralNetwork:
         return final_outputs
     
 
-    
+# Source Data
+train_x = np.load('/Users/lordxuzhiyu/Desktop/mnist_data/mnist.train.npy')
+train_y = np.load('/Users/lordxuzhiyu/Desktop/mnist_data/mnist.trainlabel.npy')
+test_x = np.load('/Users/lordxuzhiyu/Desktop/mnist_data/mnist.test.npy')
+test_y = pd.read_csv('/Users/lordxuzhiyu/Desktop/mnist_data/sample_submission.csv', usecols = ['class'])
 
+# Define two functions for preprocessing
+# One-hot encoding is used for the labels
+def one_hot_encoding(a, classes):
+    targets = a.reshape(-1)
+    a = np.eye(classes)[targets]
+    return a
 
-        
-        
-        
-        
-        
+# Change the shape of the array.
+# (AxB * BxC = AxC) 
+# e.g We will shape the 56000 * 28 * 28 3-D array to 56000 * 784 2-D array
+def matrix_mul(matrix, remain_dimen, pixels):
+    matrix = matrix.reshape(matrix.shape[remain_dimen], pixels)
+    return matrix
+
+# Prepare X for train and test
+pixels = 784
+train_x = train_x / 255
+test_x = test_x / 255   
+train_x = train_x.reshape(train_x.shape[0], pixels)
+test_x = test_x.reshape(test_x.shape[0], pixels)        
+     
+# Prepare Y for train and test
+train_y = train_y.reshape(-1, 1)
+test_y = test_y.to_numpy()
+test_y = test_y.reshape(-1, 1)
+train_y = one_hot_encoding(train_y, classes = 10)
+test_y = one_hot_encoding(test_y, classes = 10)       
+
+ 
