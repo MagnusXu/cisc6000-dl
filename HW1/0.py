@@ -137,4 +137,35 @@ n = NeuralNetwork(hidden1, hidden2, output_unit, learning_rate, N)
 # Training
 epochs = 50
 
+for epoch in range(epochs):
+    print('Train round:', epoch)
+    for i in range(N):
+        print(i)
+        inputs = (train_x[i] / 255.0 * 0.99) + 0.01
+        targets = train_y[i]
+        n.train(inputs, targets)
+        pass
+    pass
+
+scorecard = []
+
+size = test_x.shape[0]
+for i in range(size):
+    print('Test Round:', i)
+    result = test_y[i]
     
+    inputs = (test_x[i] / 255.0 * 0.99) + 0.01
+    outputs = n.run(inputs)
+    label = np.argmax(outputs)
+    
+    if(label == result):
+        scorecard.append(1)
+        print(label)
+    else:
+        scorecard.append(0)
+        print(result)
+        pass
+    pass
+
+scorecard_array = np.asarray(scorecard)
+print ("performance = ", scorecard_array.sum() / scorecard_array.size)    
